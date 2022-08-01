@@ -1,28 +1,24 @@
-import React, { useState } from 'react'
-import GetDexes from './GetDexes'
-// const Pokedex = require("pokeapi-js-wrapper")
-// const P = new Pokedex.Pokedex()
+import React, { useState, useEffect } from 'react'
+const Pokedex = require("pokeapi-js-wrapper")
 
 const PokedexComponent = () => {
-    const [snippet] = useState(GetDexes)
-    const [theDexes] = useState([])
+    const [allDexes, setAllDexes] = useState([]);
 
-    snippet.then(wring => {
-        wring.map(singleDex => {
-            console.log('SN ', singleDex.name)
-            theDexes.push({ name: singleDex.name, url: singleDex.url })
-            return singleDex
+    useEffect(function () {
+        const P = new Pokedex.Pokedex();
+        async function fetchData() {
+            await P.resource("api/v2/pokedex").then(response => setAllDexes(response.results))
+                .catch(err => console.log('Busted'))
         }
-        )
-    })
+        fetchData();
+    }, []);
 
-
-    console.log('WhoDat: ', theDexes)
-    return(
-    <h1>
-        {theDexes.map((dexSolo) => {return <a href={dexSolo.url}>{dexSolo.name}</a>} )}
-    </h1>
+    return (
+        <ul >
+            {allDexes.map((dexName) => <a key={dexName.name} href={dexName.url}><p>{dexName.name}</p></a>)}
+        </ul>
     )
+
 }
 
 export default PokedexComponent
